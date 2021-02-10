@@ -1,0 +1,32 @@
+<ul class="list-unstyled">
+  <% favorite_microposts.each do |favorite_micropost| %>
+    <li class="media mb-3">
+      <img class="mr-2 rounded" src="<%= gravatar_url(favorite_micropost.user, { size: 50 }) %>" alt="">
+      <div class="media-body">
+        <div>
+          <%= link_to favorite_micropost.user.name, user_path(favorite_micropost.user) %> <span class="text-muted">posted at <%= favorite_micropost.created_at %></span>
+        </div>
+        <div>
+          <p class="mb-0"><%= favorite_micropost.content %></p>
+        </div>
+        <div>
+          <% if current_user.favorited?(favorite_micropost) %>
+            <%= form_with(model: current_user.favorites.find_by(micropost_id: favorite_micropost.id), local: true, method: :delete) do |f| %>
+            <%= hidden_field_tag :micropost_id, favorite_micropost.id %>
+            <%= f.submit 'お気に入りから外す', class: 'btn btn-danger btn-sm' %>
+            <% end %>
+          <% else %>
+            <%= form_with(model: current_user.favorites.build, local: true) do |f| %>
+            <%= hidden_field_tag :micropost_id, favorite_micropost.id %>
+            <%= f.submit 'お気に入りに追加', class: 'btn btn-primary btn-sm' %>
+            <% end %>
+          <% end %>
+          <% if current_user == favorite_micropost.user %>
+            <%= link_to "Delete", favorite_micropost, method: :delete, data: { confirm: "You sure?" }, class: 'btn btn-danger btn-sm' %>
+          <% end %>
+        </div>
+      </div>
+    </li>
+  <% end %>
+  <%= paginate favorite_microposts %>
+</ul>
